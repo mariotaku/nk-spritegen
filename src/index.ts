@@ -23,10 +23,10 @@ let packer = new MaxRectsPacker(1024, 1024, 0, <IOption>{
 });
 let opts = yargs(hideBin(process.argv))
     .option('name', { alias: 'n', type: 'string', description: 'Name for generated spritesheets and header', required: true })
+    .option('input', { alias: 'i', type: 'string', description: 'Input directory for sprites', required: true })
+    .option('output', { alias: 'o', type: 'string', description: 'Output directory for generated spritesheets and header', required: true })
     .option('scale', { alias: 's', type: 'array', description: 'Scale factor for original image', default: [1] })
     .argv;
-
-let dir = 'sprites';
 
 function genSprite(bin: Bin<Rectangle>, name: string, scale: number = 1): Promise<OutputInfo> {
     return sharp({
@@ -44,7 +44,7 @@ function genSprite(bin: Bin<Rectangle>, name: string, scale: number = 1): Promis
             top: rect.y * scale,
             density: 72 * scale
         };
-    })).png().toFile(path.join('gen', `spritesheet_${name}@${scale}x.png`));
+    })).png().toFile(path.join(opts.output, `spritesheet_${name}@${scale}x.png`));
 }
 
 function genHeader(bin: Bin<Rectangle>, sheetname: string, scale: number[]): Promise<any> {
@@ -81,15 +81,15 @@ function genHeader(bin: Bin<Rectangle>, sheetname: string, scale: number[]): Pro
 
     source += '#endif\n';
 
-    return writeFile(path.join('gen', `spritesheet_${sheetname}.h`), source);
+    return writeFile(path.join(opts.output, `spritesheet_${sheetname}.h`), source);
 }
 
-readdir(dir).then(async files => {
+readdir(opts.input).then(async files => {
     return Promise.all(files.map(async file => {
-        let meta = await sharp(path.join(dir, file)).metadata();
+        let meta = await sharp(path.join(opts.input, file)).metadata();
         if (!meta.width || !meta.height) return null;
         return <SpriteItem>{
-            file: path.join(dir, file),
+            file: path.join(opts.input, file),
             name: path.parse(file).name,
             width: meta.width,
             height: meta.height
