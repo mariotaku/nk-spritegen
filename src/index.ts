@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import fs from 'fs';
 import { Bin, IOption, MaxRectsPacker, Rectangle } from 'maxrects-packer';
 import path from 'path';
@@ -20,8 +22,8 @@ let packer = new MaxRectsPacker(1024, 1024, 0, <IOption>{
     allowRotation: false
 });
 let opts = yargs(hideBin(process.argv))
-    .option('scale', { alias: 's', type: 'array', default: [1] })
-    .option('name', { alias: 'n', type: 'string', required: true })
+    .option('name', { alias: 'n', type: 'string', description: 'Name for generated spritesheets and header', required: true })
+    .option('scale', { alias: 's', type: 'array', description: 'Scale factor for original image', default: [1] })
     .argv;
 
 let dir = 'sprites';
