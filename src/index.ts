@@ -24,7 +24,8 @@ let packer = new MaxRectsPacker(1024, 1024, 0, <IOption>{
 let opts = yargs(hideBin(process.argv))
     .option('name', { alias: 'n', type: 'string', description: 'Name for generated spritesheets and header', required: true })
     .option('input', { alias: 'i', type: 'string', description: 'Input directory for sprites', required: true })
-    .option('output', { alias: 'o', type: 'string', description: 'Output directory for generated spritesheets and header', required: true })
+    .option('output', { alias: 'o', type: 'string', description: 'Output directory for generated spritesheets (and header if not set)', required: true })
+    .option('header', { alias: 'c', type: 'string', description: 'Output directory for generated header' })
     .option('scale', { alias: 's', type: 'array', description: 'Scale factor for original image', default: [1] })
     .argv;
 
@@ -81,7 +82,7 @@ function genHeader(bin: Bin<Rectangle>, sheetname: string, scale: number[]): Pro
 
     source += '#endif\n';
 
-    return writeFile(path.join(opts.output, `spritesheet_${sheetname}.h`), source);
+    return writeFile(path.join(opts.header ?? opts.output, `spritesheet_${sheetname}.h`), source);
 }
 
 readdir(opts.input).then(async files => {
