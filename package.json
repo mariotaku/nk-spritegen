@@ -1,7 +1,11 @@
 {
   "name": "nk-spritegen",
   "version": "1.0.0",
-  "description": "Sprite sheet generator for Nuklear",
+  "description": "Spritesheet generator for Nuklear",
+  "keywords": [
+    "nuklear",
+    "cli"
+  ],
   "main": "dist/index.js",
   "files": [
     "dist"
