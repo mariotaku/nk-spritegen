@@ -1,10 +1,15 @@
-# nk-spritegen
+# nk-spritegen ![npm](https://img.shields.io/npm/v/nk-spritegen)
 
 This is a spritesheet generator for [Nuklear](https://github.com/Immediate-Mode-UI/Nuklear).
 It generates spritesheet image from SVG images (more formats will follow) with desired density,
 and header for referencing each sprite as sub-image.
 
+## Install
+
+`npm install -g nk-spritegen`
+
 ## Usage
+
 ```
       --help     Show help                                             [boolean]
       --version  Show version number                                   [boolean]
