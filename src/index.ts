@@ -30,6 +30,7 @@ let opts = yargs(hideBin(process.argv))
     .argv;
 
 function genSprite(bin: Bin<Rectangle>, name: string, scale: number = 1): Promise<OutputInfo> {
+    let fullpath = path.join(opts.output, `spritesheet_${name}@${scale}x.png`);
     return sharp({
         create: {
             width: bin.width * scale,
@@ -45,7 +46,8 @@ function genSprite(bin: Bin<Rectangle>, name: string, scale: number = 1): Promis
             top: rect.y * scale,
             density: 72 * scale
         };
-    })).png().toFile(path.join(opts.output, `spritesheet_${name}@${scale}x.png`));
+    })).png().toFile(fullpath)
+        .then(info => <any>{ type: 'spritesheet', path: fullpath });
 }
 
 function genHeader(bin: Bin<Rectangle>, sheetname: string, scale: number[]): Promise<any> {
@@ -82,7 +84,8 @@ function genHeader(bin: Bin<Rectangle>, sheetname: string, scale: number[]): Pro
 
     source += '#endif\n';
 
-    return writeFile(path.join(opts.header ?? opts.output, `spritesheet_${sheetname}.h`), source);
+    let fullpath = path.join(opts.header ?? opts.output, `spritesheet_${sheetname}.h`);
+    return writeFile(fullpath, source).then(() => <any>{ type: 'header', path: fullpath });
 }
 
 readdir(opts.input).then(async files => {
@@ -106,7 +109,9 @@ readdir(opts.input).then(async files => {
 }).then(bin => {
     return Promise.all([...opts.scale.map(scale => genSprite(bin, opts.name, scale)), genHeader(bin, opts.name, opts.scale)]);
 }).then(info => {
-    console.log(info);
+    info.forEach(element => {
+        console.log(`Generated ${element.type}: ${element.path}`);
+    });
 }).catch(reason => {
     console.log(reason);
 });
