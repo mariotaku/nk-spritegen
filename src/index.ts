@@ -89,7 +89,7 @@ function genHeader(bin: Bin<Rectangle>, sheetname: string, scale: number[]): Pro
 }
 
 readdir(opts.input).then(async files => {
-    return Promise.all(files.map(async file => {
+    return Promise.all(files.filter(file => ['svg'].includes(path.extname(file).toLowerCase())).map(async file => {
         let meta = await sharp(path.join(opts.input, file)).metadata();
         if (!meta.width || !meta.height) return null;
         return <SpriteItem>{
