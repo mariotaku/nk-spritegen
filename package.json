@@ -22,7 +22,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "start": "tsc && node dist/index.js",
+    "start": "tsc && node dist/index.js -n ui -i sprites -o gen/ -c gen/ -s 1 -s 2 -s 3",
     "test": "echo \"No test specified\""
   },
   "dependencies": {

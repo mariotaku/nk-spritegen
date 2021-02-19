@@ -29,9 +29,9 @@ let opts = yargs(hideBin(process.argv))
     .option('scale', { alias: 's', type: 'array', description: 'Scale factor for original image', default: [1] })
     .argv;
 
-function genSprite(bin: Bin<Rectangle>, name: string, scale: number = 1): Promise<OutputInfo> {
+async function genSprite(bin: Bin<Rectangle>, name: string, scale: number = 1): Promise<OutputInfo> {
     let fullpath = path.join(opts.output, `spritesheet_${name}@${scale}x.png`);
-    return sharp({
+    const info = await sharp({
         create: {
             width: bin.width * scale,
             height: bin.height * scale,
@@ -46,11 +46,11 @@ function genSprite(bin: Bin<Rectangle>, name: string, scale: number = 1): Promis
             top: rect.y * scale,
             density: 72 * scale
         };
-    })).png().toFile(fullpath)
-        .then(info => <any>{ type: 'spritesheet', path: fullpath });
+    })).png().toFile(fullpath);
+    return <any>{ type: 'spritesheet', path: fullpath };
 }
 
-function genHeader(bin: Bin<Rectangle>, sheetname: string, scale: number[]): Promise<any> {
+async function genHeader(bin: Bin<Rectangle>, sheetname: string, scale: number[]): Promise<any> {
     var source = '#pragma once\n\n';
 
     source += '#ifndef NK_NUKLEAR_H_\n';
@@ -85,11 +85,16 @@ function genHeader(bin: Bin<Rectangle>, sheetname: string, scale: number[]): Pro
     source += '#endif\n';
 
     let fullpath = path.join(opts.header ?? opts.output, `spritesheet_${sheetname}.h`);
-    return writeFile(fullpath, source).then(() => <any>{ type: 'header', path: fullpath });
+    await writeFile(fullpath, source);
+    return <any>{ type: 'header', path: fullpath };
+}
+
+function isSupported(file: string) {
+    return ['.svg'].includes(path.extname(file).toLowerCase());
 }
 
 readdir(opts.input).then(async files => {
-    return Promise.all(files.filter(file => ['svg'].includes(path.extname(file).toLowerCase())).map(async file => {
+    return Promise.all(files.filter(file => isSupported(file)).map(async file => {
         let meta = await sharp(path.join(opts.input, file)).metadata();
         if (!meta.width || !meta.height) return null;
         return <SpriteItem>{
